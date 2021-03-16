@@ -75,7 +75,7 @@ Promises:
 */
 void UserAppInitialize(void)
 {
-
+    //initalize medicine time data here
 
 } /* end UserAppInitialize() */
 
@@ -94,8 +94,11 @@ Promises:
 */
 void UserAppRun(void)
 {
-
-
+    //get current time somehow
+    //make a call to the alarm function and store the result in a variable
+    //make a call to the LED function with the return value of alarm (put delay in the LED function to make light stay on for longer)
+    //make a call to speaker with the return value of the alarm
+    //end 
 } /* end UserAppRun */
 
 
