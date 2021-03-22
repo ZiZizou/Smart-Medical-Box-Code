@@ -59,7 +59,39 @@ Function Definitions
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 /*!--------------------------------------------------------------------------------------------------------------------
-@fn void UserAppInitialize(void)
+ * @fn void TimeCorrection(void)
+
+@brief
+ * Takes the time variables as input (u8Hours, u8minutes and u8seconds). 
+ * Checks if they have reached invalid values and changes them accordingly
+
+Should be called in the main user section after every 1 second is passed to ensure
+ * no illegal values exist
+
+Requires:
+- NONE
+
+Promises:
+- NONE
+
+*/
+
+void TimeCheck(u8* u8H, u8* u8M, u8* u8S){
+    if(*u8S>=60){
+        *u8S-=60;
+        *u8M+=1;
+    }
+    if(*u8M>=60){
+        *u8M-=60;
+        *u8H+=1;
+    }
+    if(*u8H>=24){
+        *u8H=0;
+    }
+}
+
+/*!--------------------------------------------------------------------------------------------------------------------
+ * @fn void UserAppInitialize(void)
 
 @brief
 Initializes the application's variables.
@@ -76,7 +108,10 @@ Promises:
 void UserAppInitialize(void)
 {
     //initalize medicine time data here
-
+    u8 u8Hour = 10;//enter start time details
+    u8 u8minutes =  10;//enter start time details
+    u8 u8seconds = 10;//enter start time details
+    
 } /* end UserAppInitialize() */
 
   
