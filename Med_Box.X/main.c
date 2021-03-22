@@ -60,6 +60,14 @@ void main(void)
     /* System sleep */
     HEARTBEAT_OFF();
     SystemSleep();
+    u8 u8Delay_Counter = 0;
+    while(u8Delay_Counter<20){
+        TimeXus(0xC350);
+        while((PIR3&0x80) != 0x80 ){
+            //do nothing and wait
+        }
+        u8Delay_Counter++;
+    }
     HEARTBEAT_ON();
     
   } /* end while(1) main super loop */

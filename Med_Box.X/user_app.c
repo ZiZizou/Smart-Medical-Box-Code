@@ -111,10 +111,32 @@ void UserAppInitialize(void)
     u8 u8Hour = 10;//enter start time details
     u8 u8minutes =  10;//enter start time details
     u8 u8seconds = 10;//enter start time details
-    
+    T0CON0 = 0x90;
+    T0CON1 = 0x54;
 } /* end UserAppInitialize() */
 
-  
+/*--------------------------------------------------------------------
+void TimeXus(INPUT_PARAMETER_)
+Sets Timer0 to count u16Microseconds_
+Requires:
+- Timer0 configured such that each timer tick is 1 microsecond
+- INPUT_PARAMETER_ is the value in microseconds to time from 1 to 65535
+Promises:
+- Pre-loads TMR0H:L to clock out desired period
+- TMR0IF cleared
+- Timer0 enabled
+*/
+void TimeXus(u16 u16Time)
+{
+/* OPTIONAL: range check and handle edge cases */
+    T0CON0 &= 0x7F;/* Disable the timer during config */
+    u16 u16MicroSeconds = 0xFFFF - u16Time;
+    TMR0H = (u8)(u16MicroSeconds>>8); /* Preload TMR0H and TMR0L based on u16TimeXus */
+    TMR0L = (u8)(u16MicroSeconds&0x00FF);
+    PIR3 &= 0x7F;/* Clear TMR0IF and enable Timer 0 */       
+    T0CON0 |= 0x80;
+} /* end TimeXus () */
+
 /*!----------------------------------------------------------------------------------------------------------------------
 @fn void UserAppRun(void)
 
