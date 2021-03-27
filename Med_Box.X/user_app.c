@@ -111,17 +111,10 @@ Promises:
 */
 void UserAppInitialize(void)
 {
-    //initalize medicine time data here
-    u8 u8Hour = 10;//enter start time details
-    u8 u8minutes =  10;//enter start time details
-    u8 u8seconds = 10;//enter start time details
-    u8 u8days = 0b01000000//bits showing which day the current day is. Bit 8 is unused and bit 7 is Sunday
+
     T0CON0 = 0x90;
     T0CON1 = 0x54;
-    u8 u8alarm_dur = 60;
-    u8 a_user_dat[2][7] = {//box number, total pills, pills left, pills to be taken, hour, minute, day
-        {1,50,48,2,13,30,0b01001000},{1,25,5,5,23,00,0b01000000}
-    };//sample user data
+
 } /* end UserAppInitialize() */
 
 /*--------------------------------------------------------------------
@@ -160,9 +153,20 @@ Promises:
 */
 void UserAppRun(void)
 {
-    //get current time by accessing all the time variables
-    if(1){//check current time against the current pill day and time
-       //do something 
+    //initalize medicine time data here
+    static u8 u8Hour = 10;//enter start time details
+    static u8 u8Minutes =  10;//enter start time details
+    static u8 u8Seconds = 10;//enter start time details
+    static u8 u8days = 0b01000000;//bits showing which day the current day is. Bit 8 is unused and bit 7 is Sunday
+    static u8 u8PillIndex = 0;//get current time by accessing all the time variables
+    static u8 u8alarm_dur = 60;
+    static u8 u8a_user_dat[2][7] = {//box number, total pills, pills left, pills to be taken, hour, minute, day
+        {1,50,48,2,13,30,0b01001000},{1,25,5,5,23,00,0b01000000}
+    };//sample user data
+    if((u8a_user_dat[u8PillIndex][6]&u8days)!=0)&&(u8a_user_dat[u8PillIndex][4]==u8Hour)&&(u8a_user_dat[u8PillIndex][5]==u8Minutes){//check current time against the current pill day and time
+       //call corresponding LED in the right mode
+       //call alarm in the right mode
+       //keep doing the above till snooze button is pressed
     }
     //make a call to the alarm function and store the result in a variable
     //make a call to the LED function with the return value of alarm (put delay in the LED function to make light stay on for longer)
