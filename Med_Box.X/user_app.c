@@ -115,9 +115,13 @@ void UserAppInitialize(void)
     u8 u8Hour = 10;//enter start time details
     u8 u8minutes =  10;//enter start time details
     u8 u8seconds = 10;//enter start time details
-    u8 days = 0b01000000
+    u8 u8days = 0b01000000//bits showing which day the current day is. Bit 8 is unused and bit 7 is Sunday
     T0CON0 = 0x90;
     T0CON1 = 0x54;
+    u8 u8alarm_dur = 60;
+    u8 a_user_dat[2][7] = {//box number, total pills, pills left, pills to be taken, hour, minute, day
+        {1,50,48,2,13,30,0b01001000},{1,25,5,5,23,00,0b01000000}
+    };//sample user data
 } /* end UserAppInitialize() */
 
 /*--------------------------------------------------------------------
@@ -156,7 +160,10 @@ Promises:
 */
 void UserAppRun(void)
 {
-    //get current time somehow
+    //get current time by accessing all the time variables
+    if(1){//check current time against the current pill day and time
+       //do something 
+    }
     //make a call to the alarm function and store the result in a variable
     //make a call to the LED function with the return value of alarm (put delay in the LED function to make light stay on for longer)
     //make a call to speaker with the return value of the alarm
