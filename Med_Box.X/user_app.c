@@ -76,7 +76,7 @@ Promises:
 
 */
 
-void TimeCheck(u8* u8H, u8* u8M, u8* u8S){
+void TimeCheck(u8* u8H, u8* u8M, u8* u8S, u8* u8D){
     if(*u8S>=60){
         *u8S-=60;
         *u8M+=1;
@@ -87,6 +87,10 @@ void TimeCheck(u8* u8H, u8* u8M, u8* u8S){
     }
     if(*u8H>=24){
         *u8H=0;
+        *u8D*=2;
+        if(*u8D==0b10000000){
+            *u8D=0b00000001;
+        }
     }
 }
 
@@ -111,6 +115,7 @@ void UserAppInitialize(void)
     u8 u8Hour = 10;//enter start time details
     u8 u8minutes =  10;//enter start time details
     u8 u8seconds = 10;//enter start time details
+    u8 days = 0b01000000
     T0CON0 = 0x90;
     T0CON1 = 0x54;
 } /* end UserAppInitialize() */
