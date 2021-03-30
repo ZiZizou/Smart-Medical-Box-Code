@@ -18,7 +18,7 @@ volatile u32 G_u32SystemFlags   = 0;     /*!< @brief Global system flags */
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* External global variables defined in other files (must indicate which file they are defined in) */
 
-
+void TimeXus(u16 u16MicroSeconds);
 /***********************************************************************************************************************
 Global variable definitions with scope limited to this local application.
 Variable names shall start with "Main_" and be declared as static.
