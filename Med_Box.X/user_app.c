@@ -99,8 +99,9 @@ void TimeCheck(u8* u8H, u8* u8M, u8* u8S, u8* u8D){
  * @fn void LED(void)
 
 @brief
- * Takes the time variables as input (u8Hours, u8minutes and u8seconds). 
- * Checks if they have reached invalid values and changes them accordingly
+ * Takes two parameters - BoxChoice and Mode
+ * BoxChoice is a 4 bit value (eg - 1000 means LED 1 is activated
+ * Makes LED blink to a certain pattern based on mode (2 modes - Pill Alarm and Pill Refill)
 
 Should be called in the main user section after every 1 second is passed to ensure
  * no illegal values exist
@@ -113,8 +114,19 @@ Promises:
 
 */
 
-void LED(u8 BoxChoice ){
-    
+void LED(u8 BoxChoice, u8 Mode){
+    if(BoxChoice==1){
+        PORTA = 0x01;
+    }
+    else if(BoxChoice==2){
+        PORTA = 0x02;
+    }
+    else if(BoxChoice==3){
+        PORTA = 0x04;
+    }
+    else{
+        PORTA = 0x08;
+    }
 }
 
 /*!--------------------------------------------------------------------------------------------------------------------
@@ -180,27 +192,22 @@ void UserAppRun(void)
     //initalize medicine time data here
     static u8 u8Hour = 17;//enter start time details
     static u8 u8Minutes =  34;//enter start time details
-    static u8 u8Seconds = 1;//enter start time details
+    static u8 u8Seconds = 0;//enter start time details
     static u8 u8days = 0b01111111;//bits showing which day the current day is. Bit 8 is unused and bit 7 is Sunday
     static u8 u8PillIndex = 0;//get current time by accessing all the time variables
-    static u8 u8alarm_dur = 60;
-    static u8 u8A_user_dat[2][7] = {//box number, total pills, pills left, pills to be taken, hour, minute, day
-        {1,50,48,2,17,35,0b01001000}
+    static u8 u8A_user_dat[2][7] = {//box number, set initial total pills, pills left, pills to be taken, hour, minute, day
+        {3,50,48,2,17,35,0b01001000}
     };//sample user data
     if(((u8A_user_dat[u8PillIndex][6]&u8days)!=0)&&(u8A_user_dat[u8PillIndex][4]==u8Hour)&&(u8A_user_dat[u8PillIndex][5]==u8Minutes)){//check current time against the current pill day and time
-        //call corresponding LED in the right mode
-        //call alarm in the right mode
-        //keep doing the above till snooze button is pressed
+        LED(u8A_user_dat[u8PillIndex][0]);  //Test command//call corresponding LED in the right mode
+                                            //call alarm in the right mode
+                                            //call  to ensure time increments are not missed
+                                            //keep doing the above till snooze button is pressed
     }
-    
+    //call refill function and receive return value - return function is being worked on by Atharva
+    //send return value of refill to LED and speaker function
     TimeCheck(&u8Hour, &u8Minutes, &u8Seconds, &u8days);
-    //make a call to the alarm function and store the result in a variable
-    //make a call to the LED function with the return value of alarm (put delay in the LED function to make light stay on for longer)
-    //make a call to speaker with the return value of the alarm
     //end 
- 
-    PORTA=u8Seconds; //Test command
-
 } /* end UserAppRun */
 
 
