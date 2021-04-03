@@ -91,6 +91,7 @@ void GpioSetup(void)
     ANSELA = 0x00;
     PORTA = 0x00;
     TRISA = 0x00;
+    DAC1CON= 0xA0;
   
 } /* end GpioSetup() */
 
