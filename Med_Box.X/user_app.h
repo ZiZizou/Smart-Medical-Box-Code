@@ -27,6 +27,9 @@ Function Declarations
 void UserAppInitialize(void);
 void UserAppRun(void);
 
+void TimeXus(u16 u16Time);
+void TimeXms(u16 u16Time);
+
 
 /*------------------------------------------------------------------------------------------------------------------*/
 /*! @privatesection */                                                                                            

@@ -88,10 +88,18 @@ Promises:
 */
 void GpioSetup(void)
 {
+    
+    /*-------  Port A  -------*/
+    TRISA = 0b00000000;
     ANSELA = 0x00;
     PORTA = 0x00;
-    TRISA = 0x00;
+    
+    
+    /*-------  Port B  -------*/
+    TRISB = 0b00001111;
+    ANSELB = 0x00;
   
+    
 } /* end GpioSetup() */
 
 
