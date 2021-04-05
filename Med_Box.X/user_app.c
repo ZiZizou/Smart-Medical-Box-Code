@@ -379,7 +379,8 @@ void UpdateClock() {
                     //need to add code for updating days
                     clock.day = clock.day>>1;
                     if(clock.day==0){//check if we right shifted Sunday into zero or not
-                        clock.day = 0b01000000; //next day after Sunday is Monday so set to that
+                        clock.day = 0b01000000;
+                    }//next day after Sunday is Monday so set to that
                 }
             }
         }
