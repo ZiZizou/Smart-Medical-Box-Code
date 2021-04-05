@@ -41,38 +41,36 @@ void main(void)
   SysTickSetup();
   GpioSetup();
   
-  /* Driver initialization */
  
   /* Application initialization */
   UserAppInitialize();
   
-  /* Exit initialization */
-    
-  /* Super loop */  
+  
+  /* Super loop */
+  u16 counter = 0;
+  
   while(1)
   {
-    /* Drivers */
        
     /* Applications */
     UserAppRun();
-   
+    
      
     /* System sleep */
-    HEARTBEAT_OFF();
     SystemSleep();
-    u8 u8Delay_Counter = 0;
-    while(u8Delay_Counter<20){
-        TimeXus(0xC350);
-        while((PIR3&0x80) != 0x80 ){
-            //do nothing and wait
-        }
-        u8Delay_Counter++;
-    }
-    HEARTBEAT_ON();
     
-  } /* end while(1) main super loop */
+    TimeXus(1000);
+    while((PIR3 & 0x80) == 0x00); // *** 1 ms Delay ***
+    
+    counter++;
+    if(counter == 1000){
+        LATA ^= 0x80;
+        counter = 0;
+    }
+
+  }
   
-} /* end main() */
+}
 
 
 
