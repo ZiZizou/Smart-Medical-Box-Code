@@ -43,23 +43,32 @@ typedef struct {
     u8 second;
 } Clock;
 
+/*
+ * bool days = [Mon, Tue, Wed, Thu, Fri, Sat, Sun]
+ * 
+ */
 typedef struct {
     int numOfPills;
     int numOfPillsToTake;
-    u8 days;
+    u8 days[7];
     u8 hour;
     u8 minute;
     u8 second;
 } Box;
 
 typedef struct {
-    u8 pinMask;
+    u8 bitMask;
+    u8 state;
+    bool flashing;
+} LED;
+
+typedef struct {
+    u8 bitMask;
     u8 state;
     u32 pressedTimer;
     u32 releasedTimer;
     bool pressed;
 } Button;
-
 
 
 /***********************************************************************************************************************
@@ -71,12 +80,38 @@ typedef struct {
 static Clock clock;
 
 
-/* The 4 buttons used for short and long press */
+/* Boxes */
+static Box Box1;
+static Box Box2;
+static Box Box3;
+static Box Box4;
+
+
+/* LEDs */
+static LED Led1;
+static LED Led2;
+static LED Led3;
+static LED Led4;
+
+
+/* Buttons */
 static Button Btn1;
 static Button Btn2;
 static Button Btn3;
 static Button Btn4;
 
+
+static Box Boxes[4];
+static LED Leds[4];
+static Button Buttons[4];
+
+
+/* Variable for which alarms are currently active
+ * 0: Off
+ * 1: On (Solid - Dispense Pill)
+ * 2: On (Flashing - Refill Box) 
+ */
+static u8 alarms[] = {0, 0, 0, 0};
 
 
 
@@ -96,96 +131,143 @@ void UserAppInitialize(void) {
     T0CON0 = 0x90;
 
 
+    // TODO: Add code for importing data from SD Card CSV file
+
+
     /*-------  Real Time Clock -------*/
-    
+
     // * Manually set by user at the time of Programming using the CSV
-    
+
     // Monday 8:05:30 PM
-    clock.day = 0;
-    clock.hour = 20;
-    clock.minute = 5;
-    clock.second = 30;
+    clock = (Clock){
+        .day = 0,
+        .hour = 20,
+        .minute = 5,
+        .second = 30
+    };
+
+
+    /*-------  Boxes  -------*/
+
+    Box1 = (Box){
+        .numOfPills = 5,
+        .numOfPillsToTake = 1,
+        .hour = 20,
+        .minute = 5,
+        .second = 40
+    };
+
+    Box2 = (Box){
+        .numOfPills = 10,
+        .numOfPillsToTake = 1,
+        .hour = 9,
+        .minute = 0,
+        .second = 30
+    };
+
+    Box3 = (Box){
+        .numOfPills = 20,
+        .numOfPillsToTake = 1,
+        .hour = 12,
+        .minute = 30,
+        .second = 0
+    };
+
+    Box4 = (Box){
+        .numOfPills = 50,
+        .numOfPillsToTake = 50,
+        .hour = 20,
+        .minute = 5,
+        .second = 35
+    };
+
+    u8 Box1Days[] = {1, 0, 0, 1, 0, 0, 0}; // Mon, Thu
+    u8 Box2Days[] = {0, 0, 0, 0, 1, 0, 0}; // Tue, Fri
+    u8 Box3Days[] = {0, 0, 0, 0, 0, 1, 0}; // Sat
+    u8 Box4Days[] = {1, 0, 1, 0, 1, 0, 0}; // Monday, Wed, Fri
+
+    memcpy(Box1.days, Box1Days, 7);
+    memcpy(Box2.days, Box2Days, 7);
+    memcpy(Box3.days, Box3Days, 7);
+    memcpy(Box4.days, Box4Days, 7);
+
+    /*-------  LEDs  -------*/
+
+    Led1 = (LED){
+        .bitMask = 0b00000001,
+        .state = 0,
+        .flashing = false
+    };
+
+    Led2 = (LED){
+        .bitMask = 0b00000010,
+        .state = 0,
+        .flashing = false
+    };
+
+    Led3 = (LED){
+        .bitMask = 0b00000100,
+        .state = 0,
+        .flashing = false
+    };
+
+    Led4 = (LED){
+        .bitMask = 0b00001000,
+        .state = 0,
+        .flashing = false
+    };
 
 
     /*-------  Buttons  -------*/
-    Btn1.pinMask = 0x01;
-    Btn2.pinMask = 0x02;
-    Btn3.pinMask = 0x04;
-    Btn4.pinMask = 0x08;
 
-    Btn1.state = 0x00;
-    Btn2.state = 0x00;
-    Btn3.state = 0x00;
-    Btn4.state = 0x00;
+    Btn1 = (Button){
+        .bitMask = 0b00000001,
+        .state = 0,
+        .pressedTimer = 0,
+        .releasedTimer = 0,
+        .pressed = false
+    };
 
-    Btn1.pressedTimer = 0x00;
-    Btn2.pressedTimer = 0x00;
-    Btn3.pressedTimer = 0x00;
-    Btn4.pressedTimer = 0x00;
+    Btn2 = (Button){
+        .bitMask = 0b00000010,
+        .state = 0,
+        .pressedTimer = 0,
+        .releasedTimer = 0,
+        .pressed = false
+    };
 
-    Btn1.releasedTimer = 0x00;
-    Btn2.releasedTimer = 0x00;
-    Btn3.releasedTimer = 0x00;
-    Btn4.releasedTimer = 0x00;
+    Btn3 = (Button){
+        .bitMask = 0b00000100,
+        .state = 0,
+        .pressedTimer = 0,
+        .releasedTimer = 0,
+        .pressed = false
+    };
 
-    Btn1.pressed = false;
-    Btn2.pressed = false;
-    Btn3.pressed = false;
-    Btn4.pressed = false;
-
-}
-
-
-/*
- * Updates the Clock by 1 second while checking for overflow
-
- @Promises:
-    - Updates the values of day, hour, minute, seconds stored in 'clock' struct
- * 
- */
-void UpdateClock() {
-    static u16 millisecondCounter = 0;
-    
-    if (millisecondCounter >= 1000) { /* 1 second has passed */
-        clock.second += 1;
-        millisecondCounter = 0;
-        if (clock.second == 60) {
-            clock.second = 0;
-            clock.minute += 1;
-            if (clock.minute == 60) {
-                clock.minute = 0;
-                clock.hour += 1;
-                if (clock.hour == 24) {
-                    clock.hour = 0;
-                }
-            }
-        }
-    }
-    millisecondCounter++;
-}
+    Btn4 = (Button){
+        .bitMask = 0b00001000,
+        .state = 0,
+        .pressedTimer = 0,
+        .releasedTimer = 0,
+        .pressed = false
+    };
 
 
-/*
- * Makes LED blink to a certain pattern based on mode (2 modes - Pill Alarm and Pill Refill)
+    Boxes[0] = Box1;
+    Boxes[1] = Box2;
+    Boxes[2] = Box3;
+    Boxes[3] = Box4;
 
- @Requires:
-    - Two parameters: BoxChoice and Mode
-    - BoxChoice is a 4 bit value (eg - 1000 means LED 1 is activated
-    - Should be called in the main user section after every 1 second is passed to ensure no illegal values exist
- 
- @Promises:
-    
- */
-void LED(u8 BoxChoice, u8 Mode) {
-    if (BoxChoice == 1) {
-        PORTA = 0x01;
-    } else if (BoxChoice == 2) {
-        PORTA = 0x02;
-    } else if (BoxChoice == 3) {
-        PORTA = 0x04;
-    } else {
-        PORTA = 0x08;
-    }
+    Leds[0] = Led1;
+    Leds[1] = Led2;
+    Leds[2] = Led3;
+    Leds[3] = Led4;
+
+    Buttons[0] = Btn1;
+    Buttons[1] = Btn2;
+    Buttons[2] = Btn3;
+    Buttons[3] = Btn4;
+
 }
 
 /*
@@ -254,13 +336,84 @@ void TimeXms(u16 u16Time) {
 }
 
 /*
+ * Updates the Clock by 1 second while checking for overflow
+
+ @Promises:
+    - Updates the values of day, hour, minute, seconds stored in 'clock' struct
+ * 
+ */
+void UpdateClock() {
+    static u16 millisecondCounter = 0;
+
+    if (millisecondCounter >= 1000) { /* 1 second has passed */
+        clock.second += 1;
+        millisecondCounter = 0;
+        if (clock.second == 60) {
+            clock.second = 0;
+            clock.minute += 1;
+            if (clock.minute == 60) {
+                clock.minute = 0;
+                clock.hour += 1;
+                if (clock.hour == 24) {
+                    clock.hour = 0;
+                }
+            }
+        }
+    }
+    millisecondCounter++;
+}
+
+/*
+ * Makes an LED either Solid or Flashing
+
+ @Requires:
+    - BoxChoice: Which LED to turn on
+    - flashing: Whether the LED should be flashing or solid
+     
+ */
+void ToggleLED(u8 ledChoice, bool flashing) {
+    if (!flashing) {
+        Leds[ledChoice].state = 1;
+    } else {
+        Leds[ledChoice].flashing = true;
+    }
+}
+
+/*
+ * This method will render all 4 of the LEDs according to the 'Leds' array values
+ * Either Off, Solid, or Blinking
+ */
+void RenderLEDs() {
+    u8 leds = PORTA & 0b11110000;
+    static u16 flashingCounter = 0;
+    flashingCounter++;
+
+    for (int i = 0; i < 4; i++) {
+        if (Leds[i].flashing) {
+            if (flashingCounter >= 250) {
+                Leds[i].state ^= 0x01;
+            }
+        }
+        if (Leds[i].state) {
+            leds |= Leds[i].bitMask;
+        }
+    }
+
+    if (flashingCounter >= 250) {
+        flashingCounter = 0;
+    }
+
+    LATA = leds;
+}
+
+/*
  * Don't use this function directly. This is a helper method.
  */
-void AddButtonListener(Button* btn, int pressDuration, void (*callback)()) {
+void AddButtonListener(Button* btn, int pressDuration, void (*callback)(), u8 boxChoice) {
 
     if (btn->pressed) {
 
-        if ((PORTB & btn->pinMask) == 0x00) { // Button either released or bounced
+        if ((PORTB & btn->bitMask) == 0x00) { // Button either released or bounced
             btn->releasedTimer++;
             if (btn->releasedTimer > 10) { // Button released for 10ms
                 btn->pressed = false;
@@ -271,16 +424,16 @@ void AddButtonListener(Button* btn, int pressDuration, void (*callback)()) {
 
         if (btn->pressedTimer >= pressDuration) { // How long before registers as a button press
             btn->pressed = false;
-            callback();
+            callback(boxChoice);
         }
 
-    } else if ((PORTB & btn->pinMask) != btn->state && (PORTB & btn->pinMask) == btn->pinMask) {
+    } else if ((PORTB & btn->bitMask) != btn->state && (PORTB & btn->bitMask) == btn->bitMask) {
         btn->pressed = true;
         btn->pressedTimer = 0;
         btn->releasedTimer = 0;
     }
 
-    btn->state = PORTB & btn->pinMask;
+    btn->state = PORTB & btn->bitMask;
 }
 
 /*
@@ -311,16 +464,63 @@ void AddButtonListener(Button* btn, int pressDuration, void (*callback)()) {
  */
 
 void ButtonPress(u8 btnChoice, int pressDuration, void (*callback)()) {
+    AddButtonListener(&Buttons[btnChoice], pressDuration, callback, btnChoice);
+}
 
-    if (btnChoice == 1) {
-        AddButtonListener(&Btn1, pressDuration, callback);
-    } else if (btnChoice == 2) {
-        AddButtonListener(&Btn2, pressDuration, callback);
-    } else if (btnChoice == 3) {
-        AddButtonListener(&Btn3, pressDuration, callback);
-    } else if (btnChoice == 4) {
-        AddButtonListener(&Btn4, pressDuration, callback);
+/*
+ * Will start an Alarm by turning on both the LEDs and Speaker
+
+ @Requires:
+    - u8 boxChoice: Which Box to start the Alarm for
+ *  - u8 mode: 1 = Dispense Pill Alarm, 2 = Refill Box Alarm
+ * 
+ */
+
+void StartAlarm(u8 boxChoice, u8 mode) {
+
+    if (mode == 1) { // Dispense Pill Alarm
+
+        alarms[boxChoice] = 1;
+        ToggleLED(boxChoice, false);
+
+    } else if (mode == 2) { // Refill Box Alarm
+
+        alarms[boxChoice] = 2;
+        ToggleLED(boxChoice, true);
+
     }
+
+    // TODO: Add code for Alarming speaker
+}
+
+/*
+ * Will end an Alarm that's already running. It will automatically start a new Refill alarm if the box is empty
+
+ @Requires:
+    - u8 boxChoice: Which Box to stop the Alarm for
+ * 
+ */
+void EndAlarm(u8 boxChoice) {
+
+    if (alarms[boxChoice] == 1) {
+
+        Boxes[boxChoice].numOfPills -= Boxes[boxChoice].numOfPillsToTake;
+
+        if (Boxes[boxChoice].numOfPills <= 0) { // Box is empty
+            StartAlarm(boxChoice, 2); // Create new alarm for Box Refill and return
+            return;
+        }
+
+    } else if (alarms[boxChoice] == 2) {
+        // TODO: Reset numOfPills from CSV
+        Boxes[boxChoice].numOfPills = 20;
+    }
+
+    alarms[boxChoice] = 0;
+    Leds[boxChoice].state = 0;
+    Leds[boxChoice].flashing = false;
+    // TODO: Turn off Speaker
+
 }
 
 /*!----------------------------------------------------------------------------------------------------------------------
@@ -330,28 +530,34 @@ void ButtonPress(u8 btnChoice, int pressDuration, void (*callback)()) {
  *!----------------------------------------------------------------------------------------------------------------------
  */
 
-void UserAppRun(void) {
+void UserAppRun(void)
+{
 
     UpdateClock();
 
-    // initalize medicine time data here
-//    static u8 u8Hour = 17; // enter start time details
-//    static u8 u8Minutes = 34; // enter start time details
-//    static u8 u8Seconds = 0; // enter start time details
-//    static u8 u8days = 0b01111111; // bits showing which day the current day is. Bit 8 is unused and bit 7 is Sunday
-//    static u8 u8PillIndex = 0; // get current time by accessing all the time variables
-//    static u8 u8A_user_dat[2][7] = {// box number, set initial total pills, pills left, pills to be taken, hour, minute, day
-//        {3, 50, 48, 2, 17, 35, 0b01001000}
-//    }; // sample user data
-//    if (((u8A_user_dat[u8PillIndex][6] & u8days) != 0)&&(u8A_user_dat[u8PillIndex][4] == u8Hour)&&(u8A_user_dat[u8PillIndex][5] == u8Minutes)) {// check current time against the current pill day and time
-//        LED(u8A_user_dat[u8PillIndex][0]); // Test command//call corresponding LED in the right mode
-//        // call alarm in the right mode
-//        // call  to ensure time increments are not missed
-//        // keep doing the above till snooze button is pressed
-//    }
-//    // call refill function and receive return value - return function is being worked on by Atharva
-//    // send return value of refill to LED and speaker function
 
+    // Check if its time for taking a pill in any of the boxes:
+    for (int i = 0; i < 4; i++) {
+
+        if (Boxes[i].days[clock.day] == 1 &&
+                Boxes[i].hour == clock.hour &&
+                Boxes[i].minute == clock.minute &&
+                Boxes[i].second == clock.second)
+        {
+            StartAlarm(i, 1); // Start the Alarm for Dispensing Pill
+
+        }
+    }
+
+    for (u8 i = 0; i < 4; i++) {
+        if (alarms[i] == 1) {
+            ButtonPress(i, 50, EndAlarm); // Short Press - 50ms
+        } else if (alarms[i] == 2) {
+            ButtonPress(i, 2000, EndAlarm); // Long Press - 2000ms
+        }
+    }
+
+    RenderLEDs();
 
 }
 

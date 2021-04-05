@@ -96,6 +96,7 @@ Includes
 #include <stdbool.h>
 #include "typedefs.h"
 #include "main.h"
+#include <string.h>
 
 /* ENCM 369 Activities specific header files */
 #include "encm369_pic18.h"
