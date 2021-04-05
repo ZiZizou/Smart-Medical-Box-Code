@@ -497,9 +497,22 @@ void ButtonPress(u8 btnChoice, int pressDuration, void (*callback)()) {
  */
 
 void StartAlarm(u8 boxChoice, u8 mode) {
-
-    if (mode == 1) { // Dispense Pill Alarm
-
+    
+    u8 index=0;
+    u32 i=0;
+    if (mode == 1) { 
+        
+        // Dispense Pill Alarm
+      while(i<4000000) // ~ approx 10 seconds alarm 
+        {
+            DAC1DATL=G_au8UserAppsinTable[index];
+            index+=4;
+            TimeXus(11);
+            i++;  
+        }
+        i=0;
+  
+        
         alarms[boxChoice] = 1;
         ToggleLED(boxChoice, false);
 
@@ -507,6 +520,15 @@ void StartAlarm(u8 boxChoice, u8 mode) {
 
         alarms[boxChoice] = 2;
         ToggleLED(boxChoice, true);
+        while(i<4000000)
+        {
+            DAC1DATL=G_au8UserAppsinTable[index];
+            index++;
+            TimeXus(11);
+            i++;  
+        }
+        i=0;
+        index=0;
 
     }
 
