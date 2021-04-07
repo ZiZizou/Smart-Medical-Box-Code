@@ -356,6 +356,10 @@ void UpdateClock() {
                 clock.hour += 1;
                 if (clock.hour == 24) {
                     clock.hour = 0;
+                    clock.day += 1;
+                    if(clock.day == 7){
+                        clock.day = 0;
+                    }
                 }
             }
         }
