@@ -9,6 +9,7 @@
       <itemPath>main.h</itemPath>
       <itemPath>typedefs.h</itemPath>
       <itemPath>user_app.h</itemPath>
+      <itemPath>../../../2021_ENCM369/PIC_Activity7/music.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -27,6 +28,9 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>../../../2021_ENCM369/PIC_Activity7</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">

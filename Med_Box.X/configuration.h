@@ -103,6 +103,7 @@ Includes
 /* Common driver header files */
 
 /* Common application header files */
+#include "music.h"
 #include "user_app.h"
 
 

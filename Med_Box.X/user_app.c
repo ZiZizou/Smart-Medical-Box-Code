@@ -69,6 +69,33 @@ u8 G_au8UserAppsinTable[] =
 0x25,0x28,0x2a,0x2c,0x2f,0x31,0x34,0x36,0x39,0x3b,0x3e,0x41,0x43,0x46,0x49,0x4c,
 0x4f,0x52,0x55,0x58,0x5a,0x5d,0x61,0x64,0x67,0x6a,0x6d,0x70,0x73,0x76,0x79,0x7c   
 };
+u8 G_au8Notes[] = {E4,NN,G4,NN,A4,NN,A4,NN,
+                             E4,NN,G4,NN,B4,NN,A4,NN,
+                             E4,NN,G4,NN,A4,NN,A4,NN,
+                             A4,NN,E4,NN,E4,NN,B4,NN,
+                             A4,NN,G4,NN,A4,NN,G4,NN,
+                             B4,NN,C4,NN,C4,NN,G4,NN,
+                             B4,NN,C4,NN,C4,NN,G4,NN,
+                             B4,NN ,C4,NN,C4,NN,D4,NN,
+                             D4,NN,D4,NN,D4,NN,E4,NN,
+                             E4,NN ,F,NN,F,NN,G4,NN,A4,NN,
+                             G4,NN,A4,NN ,G4,NN ,A4,NN ,G4,NN}; //fefeca a#a
+    u8 G_au8NOTEDurations[] = {N4,RT,N4,RT,N4,RT,N4,RT,N4,
+                                     RT,N4,RT,N2,RT,RT,N4,RT,N4,
+                                     N4,RT,N4,RT,N4,RT,N4,RT,N4,
+                                     RT,N4,RT,N2,RT,RT,N4,RT,N4,
+                                     N4,RT,N4,RT,N4,RT,N4,RT,N4,
+                                     RT,N4,RT,N2,RT,RT,N4,RT,N4,
+                                     N4,RT,N4,RT,N4,RT,N4,RT,N4,
+                                     RT,N4,RT,N2,RT,RT,N4,RT,N4,
+                                     N4,RT,N4,RT,N4,RT,N4,RT,N4,
+                                     RT,N4,RT,N2,RT,RT,N4,RT,N4,
+                                     N4,RT,N4,RT,N4,RT,N4,RT,N4,
+                                     RT,N4,RT,N2,RT,RT,N4,RT,N4,
+                                     N4,RT,N4,RT,N4,RT,N4,RT,N4,
+                                     RT,N4,RT,N2,RT,RT,N4,RT,N4,
+                                     N4,RT,N4,RT,N4,RT,N4,RT,N4,
+                                     RT,N4,RT,N4,RT,RT,N4,RT,N4};
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*! @publicsection */                                                                                            
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -533,6 +560,9 @@ void StartAlarm(u8 boxChoice, u8 mode) {
     
     u8 index=0;
     u32 i=0;
+    u32 Count=0;
+    u8  u8Index=0;
+    u8 Length=92;
     if (mode == 1) { 
         
         // Dispense Pill Alarm
@@ -555,13 +585,20 @@ void StartAlarm(u8 boxChoice, u8 mode) {
         ToggleLED(boxChoice, true);
         while(i<4000000)
         {
-            DAC1DATL=G_au8UserAppsinTable[index];
-            index++;
-            TimeXus(11);
-            i++;  
+            if(u32Count==G_au8NOTEDurations[u8Index])
+            {
+                u8Index++;
+                u32Count^=u32Count;
+            }
+            if(u8Index==Length)
+            {
+                u8Index=0;
+            }
+            u32Count++;
+            TimerXus(G_au8Notes[u8Index]); 
         }
         i=0;
-        index=0;
+        
 
     }
 
