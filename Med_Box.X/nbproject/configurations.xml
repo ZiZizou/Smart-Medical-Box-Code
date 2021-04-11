@@ -256,6 +256,8 @@
         <property key="memories.programmemory.ranges" value="0-1ffff"/>
         <property key="memories.rww" value="true"/>
         <property key="poweroptions.powerenable" value="true"/>
+        <property key="programmerToGoFilePath"
+                  value="C:/Users/Redhat/Desktop/Smart-Medical-Box-Code/Med_Box.X/debug/default/Med_Box_ptg"/>
         <property key="programmerToGoImageName" value="Med_Box_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>

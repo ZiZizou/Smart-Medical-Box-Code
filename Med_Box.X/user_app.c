@@ -257,25 +257,25 @@ void UserAppInitialize(void) {
     /*-------  LEDs  -------*/
 
     Led1 = (LED){
-        .bitMask = 0b00000001,
+        .bitMask = 0b00010000,
         .state = 0,
         .flashing = false
     };
 
     Led2 = (LED){
-        .bitMask = 0b00000010,
+        .bitMask = 0b00100000,
         .state = 0,
         .flashing = false
     };
 
     Led3 = (LED){
-        .bitMask = 0b00000100,
+        .bitMask = 0b01000000,
         .state = 0,
         .flashing = false
     };
 
     Led4 = (LED){
-        .bitMask = 0b00001000,
+        .bitMask = 0b10000000,
         .state = 0,
         .flashing = false
     };
@@ -445,7 +445,7 @@ void ToggleLED(u8 ledChoice, bool flashing) {
  * Either Off, Solid, or Blinking
  */
 void RenderLEDs() {
-    u8 leds = PORTA & 0b11110000;
+    u8 leds = PORTA & ~(Leds[0].bitMask + Leds[1].bitMask + Leds[2].bitMask + Leds[3].bitMask);
     static u16 flashingCounter = 0;
     flashingCounter++;
 

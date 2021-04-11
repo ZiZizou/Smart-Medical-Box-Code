@@ -48,21 +48,9 @@ void main(void)
     ClockSetup();
     SysTickSetup();
     GpioSetup();
-    
-    
-
 
     /* Application initialization */
     UserAppInitialize();
-    
-//    Boxes[3].numOfPills = 50;
-//    Boxes[3].numOfPillsToTake = 50;
-//    Boxes[3].minute = 5;
-//    Boxes[3].second = 35;
-//    Boxes[3].hour = 20;
-//    
-//    u8 Box4Days[] = {1, 0, 1, 0, 1, 0, 0}; // Monday, Wed, Fri
-//    memcpy(Boxes[3].days, Box4Days, 7);
 
 
     /* Super loop */
@@ -83,7 +71,7 @@ void main(void)
 
       counter++;
       if(counter == 1000){
-          LATA ^= 0x80; // Toggle Heartbeat LED
+          LATA ^= 0b00001000; // Toggle Heartbeat LED
           counter = 0;
       }
 
