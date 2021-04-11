@@ -5,6 +5,7 @@
  **********************************************************************************************************************/
 
 #include "configuration.h"
+#include "mcc_generated_files/fatfs/ff.h"
 
 /***********************************************************************************************************************
 Global variable definitions with scope across entire project.
@@ -114,11 +115,108 @@ static Button Buttons[4];
 static u8 alarms[] = {0, 0, 0, 0};
 
 
+FATFS drive;
+FIL file;
 
 
 /**********************************************************************************************************************
 Function Definitions
  **********************************************************************************************************************/
+
+void ImportFromCSV(char* fileName){
+        
+    char line[50];
+    char firstLine[100];
+    
+    if (f_mount(&drive, "0:", 1) == FR_OK){  // mount disk
+       
+        if (f_open(&file, fileName, FA_READ ) == FR_OK) {
+            
+            f_gets(firstLine, sizeof(firstLine), &file); // Skip first line
+
+            while (f_gets(line, sizeof(line), &file)){
+                
+                /****** CSV Parser Start ******/
+                
+                int i = 0;
+                int boxIndex = 0;
+                char *token;
+                char *ptr = line;
+
+                while ((token = strtok(ptr, ",")) != NULL){	
+
+                    if(i == 0){
+
+                        boxIndex = token[0] - '0' - 1;
+                        //printf("boxIndex is %d\n", boxIndex);
+
+                    } else if (i == 1) {
+
+                        int numOfPills = strtol(token, NULL, 10);
+                        //printf("numOfPills is %d\n", numOfPills);
+                        Boxes[boxIndex].numOfPills = numOfPills;
+
+                    } else if (i == 2) {
+
+                        int numOfPillsTokTake = strtol(token, NULL, 10);
+                        //printf("numOfPillsToTake is %d\n", numOfPillsTokTake);
+                        Boxes[boxIndex].numOfPillsToTake = numOfPillsTokTake;
+
+                    } else if (i == 3) {
+                        int j = 0, k = 0;
+                        char hrs[3];
+                        char mins[3];
+
+                        while (token[j] != ':'){
+                            hrs[k] = token[j];
+                            j++;
+                            k++;
+                        }
+
+                        k = 0;
+                        j++;
+                        while (token[j] != '\0'){
+                            mins[k] = (char) (token[j] - 0);
+                            j++;
+                            k++;
+                        }
+
+                        u8 hour = strtol(hrs, NULL, 10);
+                        u8 minute = strtol(mins, NULL, 10);
+
+                        //printf("Time is %d : %d\n\n", hour, minute);
+                        Boxes[boxIndex].hour = hour;
+                        Boxes[boxIndex].minute = minute;
+
+                    } else if (i == 4) {
+
+                        u8 days[7];
+
+                        for (u8 j = 0; j<7; j++){
+                            days[j] = token[j] - '0';
+                        }
+
+                        memcpy(Boxes[boxIndex].days, days, 7);
+                    }
+
+                    Boxes[boxIndex].second = 35; // TODO: Fix this shit
+
+                    ptr = NULL;
+                    i++;
+                }
+                
+                /****** CSV Parser End ******/
+
+            }
+            
+            f_close(&file);
+        }
+      
+      f_mount(0, "0:", 0);  // unmount disk
+    }
+    
+}
+
 
 /*
 @brief
@@ -131,10 +229,7 @@ void UserAppInitialize(void) {
     T0CON0 = 0x90;
 
 
-    // TODO: Add code for importing data from SD Card CSV file
-
-
-    /*-------  Real Time Clock -------*/
+    /*-------  Real Time Clock  -------*/
 
     // * Manually set by user at the time of Programming using the CSV
 
@@ -145,52 +240,20 @@ void UserAppInitialize(void) {
         .minute = 5,
         .second = 30
     };
-
-
+    
+    
     /*-------  Boxes  -------*/
-
-    Box1 = (Box){
-        .numOfPills = 5,
-        .numOfPillsToTake = 1,
-        .hour = 20,
-        .minute = 5,
-        .second = 40
-    };
-
-    Box2 = (Box){
-        .numOfPills = 10,
-        .numOfPillsToTake = 1,
-        .hour = 9,
-        .minute = 0,
-        .second = 30
-    };
-
-    Box3 = (Box){
-        .numOfPills = 20,
-        .numOfPillsToTake = 1,
-        .hour = 12,
-        .minute = 30,
-        .second = 0
-    };
-
-    Box4 = (Box){
-        .numOfPills = 50,
-        .numOfPillsToTake = 50,
-        .hour = 20,
-        .minute = 5,
-        .second = 35
-    };
-
-    u8 Box1Days[] = {1, 0, 0, 1, 0, 0, 0}; // Mon, Thu
-    u8 Box2Days[] = {0, 0, 0, 0, 1, 0, 0}; // Tue, Fri
-    u8 Box3Days[] = {0, 0, 0, 0, 0, 1, 0}; // Sat
-    u8 Box4Days[] = {1, 0, 1, 0, 1, 0, 0}; // Monday, Wed, Fri
-
-    memcpy(Box1.days, Box1Days, 7);
-    memcpy(Box2.days, Box2Days, 7);
-    memcpy(Box3.days, Box3Days, 7);
-    memcpy(Box4.days, Box4Days, 7);
-
+    
+    Boxes[0] = Box1;
+    Boxes[1] = Box2;
+    Boxes[2] = Box3;
+    Boxes[3] = Box4;
+    
+    /***  Import data for each box from CSV  ***/
+    ImportFromCSV("data.csv");
+    
+    
+    
     /*-------  LEDs  -------*/
 
     Led1 = (LED){
@@ -216,6 +279,11 @@ void UserAppInitialize(void) {
         .state = 0,
         .flashing = false
     };
+    
+    Leds[0] = Led1;
+    Leds[1] = Led2;
+    Leds[2] = Led3;
+    Leds[3] = Led4;
 
 
     /*-------  Buttons  -------*/
@@ -252,22 +320,11 @@ void UserAppInitialize(void) {
         .pressed = false
     };
 
-
-    Boxes[0] = Box1;
-    Boxes[1] = Box2;
-    Boxes[2] = Box3;
-    Boxes[3] = Box4;
-
-    Leds[0] = Led1;
-    Leds[1] = Led2;
-    Leds[2] = Led3;
-    Leds[3] = Led4;
-
     Buttons[0] = Btn1;
     Buttons[1] = Btn2;
     Buttons[2] = Btn3;
     Buttons[3] = Btn4;
-
+    
 }
 
 /*

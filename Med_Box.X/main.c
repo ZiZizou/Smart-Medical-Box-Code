@@ -1,7 +1,7 @@
 /*!**********************************************************************************************************************
 @file main.c                                                                
 @brief Main system file for the ENCM 369 firmware.  
-***********************************************************************************************************************/
+***********************************************************************************************************************/ 
 
 #include "mcc_generated_files/mcc.h"
 
@@ -35,42 +35,6 @@ Variable names shall start with "Main_" and be declared as static.
 ***********************************************************************************************************************/
 
 
-FATFS drive;
-FIL file;
-
-const char* readCard(){
-    UINT actualLength;
-    char dataNewLine[] = "\r\n";
-    char contents[] = "The number is: ";
-    char buffer[8];
-    UINT br;
-    
-    
-    if (f_mount(&drive,"0:",1) == FR_OK){  // mount
-       
-        if (f_open(&file, "data.csv", FA_READ ) == FR_OK) { //Open/Append or Create DATA.TXT file
-        
-//            f_write(&file, contents , sizeof(contents)-1, &actualLength );     //Write Temperature is:
-//            f_write(&file, num , sizeof(num)-1, &actualLength ); //write temperature value            
-//            f_write(&file, dataNewLine, sizeof(dataNewLine)-1, &actualLength );  //go to new line            
-//                 
-            
-            if(f_read(&file, buffer, sizeof(buffer), &br) == FR_OK){
-                return buffer;
-            }
-            
-                
-            f_close(&file);
-
-        }
-      
-        
-      f_mount(0,"0:",0);  //unmount disk
-    }
-    return buffer;
-}
-
-
 void main(void)
 {
     
@@ -78,8 +42,7 @@ void main(void)
     
     /***************** MCC Initialization *****************/
     SYSTEM_Initialize();
-  
-    char* contents = readCard();
+    
     
     /* Low level initialization */
     ClockSetup();
@@ -91,6 +54,15 @@ void main(void)
 
     /* Application initialization */
     UserAppInitialize();
+    
+//    Boxes[3].numOfPills = 50;
+//    Boxes[3].numOfPillsToTake = 50;
+//    Boxes[3].minute = 5;
+//    Boxes[3].second = 35;
+//    Boxes[3].hour = 20;
+//    
+//    u8 Box4Days[] = {1, 0, 1, 0, 1, 0, 0}; // Monday, Wed, Fri
+//    memcpy(Boxes[3].days, Box4Days, 7);
 
 
     /* Super loop */
@@ -98,8 +70,6 @@ void main(void)
 
     while(1)
     {
-        
-        
 
       /* Applications */
       UserAppRun();
