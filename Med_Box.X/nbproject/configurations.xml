@@ -4,6 +4,33 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <logicalFolder name="mcc_generated_files"
+                     displayName="mcc_generated_files"
+                     projectFiles="true">
+        <logicalFolder name="docs" displayName="docs" projectFiles="true">
+          <logicalFolder name="doxygen_generator"
+                         displayName="doxygen_generator"
+                         projectFiles="true">
+          </logicalFolder>
+        </logicalFolder>
+        <logicalFolder name="drivers" displayName="drivers" projectFiles="true">
+          <itemPath>mcc_generated_files/drivers/spi_master.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="fatfs" displayName="fatfs" projectFiles="true">
+          <itemPath>mcc_generated_files/fatfs/diskio.h</itemPath>
+          <itemPath>mcc_generated_files/fatfs/fatfs_demo.h</itemPath>
+          <itemPath>mcc_generated_files/fatfs/ff.h</itemPath>
+          <itemPath>mcc_generated_files/fatfs/ffconf.h</itemPath>
+          <itemPath>mcc_generated_files/fatfs/integer.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="sd_spi" displayName="sd_spi" projectFiles="true">
+          <itemPath>mcc_generated_files/sd_spi/sd_spi.h</itemPath>
+        </logicalFolder>
+        <itemPath>mcc_generated_files/device_config.h</itemPath>
+        <itemPath>mcc_generated_files/mcc.h</itemPath>
+        <itemPath>mcc_generated_files/pin_manager.h</itemPath>
+        <itemPath>mcc_generated_files/spi1.h</itemPath>
+      </logicalFolder>
       <itemPath>configuration.h</itemPath>
       <itemPath>encm369_pic18.h</itemPath>
       <itemPath>main.h</itemPath>
@@ -17,6 +44,33 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <logicalFolder name="mcc_generated_files"
+                     displayName="mcc_generated_files"
+                     projectFiles="true">
+        <logicalFolder name="docs" displayName="docs" projectFiles="true">
+          <logicalFolder name="doxygen_generator"
+                         displayName="doxygen_generator"
+                         projectFiles="true">
+          </logicalFolder>
+        </logicalFolder>
+        <logicalFolder name="drivers" displayName="drivers" projectFiles="true">
+          <itemPath>mcc_generated_files/drivers/spi_master.c</itemPath>
+        </logicalFolder>
+        <logicalFolder name="fatfs" displayName="fatfs" projectFiles="true">
+          <itemPath>mcc_generated_files/fatfs/diskio.c</itemPath>
+          <itemPath>mcc_generated_files/fatfs/fatfs_demo.c</itemPath>
+          <itemPath>mcc_generated_files/fatfs/ff.c</itemPath>
+          <itemPath>mcc_generated_files/fatfs/ffsystem.c</itemPath>
+          <itemPath>mcc_generated_files/fatfs/ffunicode.c</itemPath>
+        </logicalFolder>
+        <logicalFolder name="sd_spi" displayName="sd_spi" projectFiles="true">
+          <itemPath>mcc_generated_files/sd_spi/sd_spi.c</itemPath>
+        </logicalFolder>
+        <itemPath>mcc_generated_files/device_config.c</itemPath>
+        <itemPath>mcc_generated_files/mcc.c</itemPath>
+        <itemPath>mcc_generated_files/pin_manager.c</itemPath>
+        <itemPath>mcc_generated_files/spi1.c</itemPath>
+      </logicalFolder>
       <itemPath>encm369_pic18.c</itemPath>
       <itemPath>main.c</itemPath>
       <itemPath>user_app.c</itemPath>
@@ -27,6 +81,9 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>mcc_generated_files</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">

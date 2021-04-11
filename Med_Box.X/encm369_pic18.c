@@ -88,6 +88,8 @@ Promises:
 */
 void GpioSetup(void)
 {
+    /*--- DO NOT overwrite the configuration bits for C pins ---*/
+    /* Look at mcc_generated_files/pin_manager.c before overwriting anything */
     
     /*-------  Port A  -------*/
     TRISA = 0b00000000;

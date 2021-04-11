@@ -30,9 +30,9 @@ Custom types should be defined with "Type" as the last word in the typedef.
 /*! @cond DOXYGEN_EXCLUDE */
 typedef char CHAR;              /* Signed 8-bits */
 typedef unsigned char UCHAR;    /* Unsigned 8-bits */
-typedef short SHORT;            /* Signed 16-bits */
+// typedef short SHORT;            /* Signed 16-bits */
 typedef unsigned short USHORT;  /* Unsigned 16-bits */
-typedef long LONG;              /* Signed 32-bits */
+// typedef long LONG;              /* Signed 32-bits */
 typedef unsigned long ULONG;    /* Unsigned 32-bits */
 typedef unsigned char BOOL;     /* Boolean */
 /*! @endcond */
