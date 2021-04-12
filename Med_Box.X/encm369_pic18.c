@@ -96,6 +96,10 @@ void GpioSetup(void)
     ANSELA = 0x00;
     PORTA = 0x00;
     
+    /* Configure DAC1 for Vdd and Vss references, on, and RA2 output. */
+    DAC1CON = 0xA0; // 10100000
+    DAC1DATL = 0;
+    
     
     /*-------  Port B  -------*/
     TRISB = 0b00001111;
